@@ -7,8 +7,11 @@
 #import "parts/thanks-conf.typ": thanks
 #import "parts/code-conf.typ": code
 #import "parts/hhu-bibliography.typ": hhu-bibliography
+#import "parts/translation-conf.typ": translation-bilingual
 
-#import "setup/set-bachelor.typ": set-bachelor
+#import "setup/set-bachelor.typ": set-bachelor, chinese-numbering, ziti, zihao
+
+#import "utils/utils.typ": i-figured
 
 #let bachelor-conf(
   author: (CN: "李华", EN: "Li Hua", ID: "2162510220", YEAR: "2021级"),

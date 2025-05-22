@@ -1,6 +1,6 @@
 // #import "@preview/shane-hhu-thesis:0.4.0": bachelor-conf, thanks, appendix, code
 
-#import "../hhu-thesis/template.typ": bachelor-conf, thanks, appendix, code, hhu-bibliography
+#import "../hhu-thesis/template.typ": bachelor-conf, thanks, appendix, code, hhu-bibliography, translation-bilingual
 // 使用前请先安装 `https://github.com/shaneworld/Dots/tree/master/fonts` 中的全部字体
 
 #show: doc => bachelor-conf(
@@ -318,15 +318,33 @@ Typst 默认尝试使用数学方式表现，例如 ```typ $I=V / R$``` 会显�
 
 如果有必要可以设置附录。该部分包括与论文有关的原始数据明细表，较多的图表，计算程序及说明，过长的公式推导，或取材于复制品而不便于编入正文的材料等。附录一般与论文全文装订在一起，与正文一起编页码。如果附录内容很多，可独立成册。若有多个附录，则按大写英文字母编号排序，如附录 A、附录 B 等，每一个附录均另起一页。附录中的公式及图表编号应冠以附录序号字母加一短划线，如公式（A-2）、图 A-2，表 B-2 等。
 
-= 补充内容
+= 论文翻译
 
-附录将以附录（A），附录（B）......的形式编号。
-
-#align(center)[......]
-
-#align(center)[......]
-
-#align(center)[......]
-
-#align(center)[......]
-
+#translation-bilingual(
+  title : (
+    CN: [论文标题],
+    EN: [Thesis Title]
+  ),
+  authors : (
+    CN: ("作者1", "作者2", "作者3"),
+    EN: ("author1", "author2", "author3")
+  ),
+  abstract : (
+    CN: [#lorem(80)],
+    EN: [#lorem(80)]
+  ),
+  keywords : (
+    CN: [关键词1, 关键词2, 关键词3],
+    EN: [keywords1, keywords2, keywords3]
+  ),
+  content: (
+    CN: [
+      = 引言
+      这里写中文正文内容
+    ],
+    EN: [
+      = Introduction
+      这里写英文原文内容
+    ],
+  )
+)
