@@ -68,6 +68,41 @@
 
 具体设置参见 [hhu-bibliography](https://github.com/shaneworld/HHU-Thesis-Template/blob/master/hhu-thesis/parts/hhu-bibliography.typ) 文件。
 
+### 附录外文翻译
+
+本模版根据河海大学要求，在附录部分新增外文翻译模块。可以在附录最后添加如下内容使用：
+
+```typst
+#translation-bilingual(
+  title : (
+    CN: [论文标题],
+    EN: [Thesis Title]
+  ),
+  authors : (
+    CN: ("作者1", "作者2", "作者3"),
+    EN: ("author1", "author2", "author3")
+  ),
+  abstract : (
+    CN: [#lorem(80)],
+    EN: [#lorem(80)]
+  ),
+  keywords : (
+    CN: [关键词1, 关键词2, 关键词3],
+    EN: [keywords1, keywords2, keywords3]
+  ),
+  content: (
+    CN: [
+      = 引言
+      这里写中文正文内容
+    ],
+    EN: [
+      = Introduction
+      这里写英文原文内容
+    ],
+  )
+)
+```
+
 如果发现模板的问题，欢迎提交 issue。
 
 ## 致谢
