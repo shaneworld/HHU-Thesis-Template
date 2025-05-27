@@ -141,50 +141,64 @@ Typst 默认尝试使用数学方式表现，例如 ```typ $I=V / R$``` 会显�
   ```typst
   #figure(
     {
-      set table.cell(stroke: (top: 0.5pt, bottom: 0.5pt, left: 0pt, right: 0pt))
       show table.cell.where(y:0): set text(weight: "bold")
+      let toprule = table.hline(stroke: 0.08em)
+      let bottomrule = toprule
+      let midrule = table.hline(stroke: 0.05em)
       table(
         columns: 6,
+        stroke: none,
         inset: (
           x: 25pt,
           y: 10pt,
         ),
         align: center + horizon,
         // 表格内容
+        toprule,
         table.cell(rowspan: 2)[实验编码], [H], [Q], [J], [B], [$U_*$],
+        midrule,
         [$"cm"$], [$"L/s"$], [$permille$], [$"cm"$], [$"cm/s"$],
+        midrule,
         [w1], [18], [7.56], [0.02], [42], [0.19], 
         [w2], [18], [11.34], [0.07], [42], [0.68], 
         [w3], [18], [15.12], [0.13], [42], [1.27], 
         [w4], [18], [18.9], [0.21], [42], [2.05], 
-        [w5], [18], [22.68], [0.28], [42], [2.73]
+        [w5], [18], [22.68], [0.28], [42], [2.73],
+        bottomrule,
       )
       // text(align: left, [其中：$U_*$为摩阻流速，$U_* = sqrt("JRg")$，（其中R 为水力半径）；J为水力坡降，B为水槽宽度，H为水深。])
     },
     caption: "光滑明渠水流实验水力条件",
-  )<table1​>
+  )
   ```
 ) 
 
 #figure(
   {
-    set table.cell(stroke: (top: 0.5pt, bottom: 0.5pt, left: 0pt, right: 0pt))
     show table.cell.where(y:0): set text(weight: "bold")
+    let toprule = table.hline(stroke: 0.08em)
+    let bottomrule = toprule
+    let midrule = table.hline(stroke: 0.05em)
     table(
       columns: 6,
+      stroke: none,
       inset: (
         x: 25pt,
         y: 10pt,
       ),
       align: center + horizon,
       // 表格内容
+      toprule,
       table.cell(rowspan: 2)[实验编码], [H], [Q], [J], [B], [$U_*$],
+      midrule,
       [$"cm"$], [$"L/s"$], [$permille$], [$"cm"$], [$"cm/s"$],
+      midrule,
       [w1], [18], [7.56], [0.02], [42], [0.19], 
       [w2], [18], [11.34], [0.07], [42], [0.68], 
       [w3], [18], [15.12], [0.13], [42], [1.27], 
       [w4], [18], [18.9], [0.21], [42], [2.05], 
-      [w5], [18], [22.68], [0.28], [42], [2.73]
+      [w5], [18], [22.68], [0.28], [42], [2.73],
+      bottomrule,
     )
     // text(align: left, [其中：$U_*$为摩阻流速，$U_* = sqrt("JRg")$，（其中R 为水力半径）；J为水力坡降，B为水槽宽度，H为水深。])
   },
@@ -287,6 +301,20 @@ Typst 默认尝试使用数学方式表现，例如 ```typ $I=V / R$``` 会显�
 就会自动生成参考文献表。模板使用的 `ref.bib` 来自 https://github.com/lucifer1004/pkuthss-typst 。
 
 根据要求，河海大学本科毕业论文要求参考文献部分采用 `GB7714-2005`。
+
+#figure(
+  gap: 1.8em,
+  caption: "多变量数据集三个模型训练损失对比",
+  align(center,grid(
+    columns:1,
+    gutter: 0.5em,
+    image("./assets/1.png", width: 94%) + "(a) LTC的训练损失", 
+    [],
+    image("./assets/2.png", width: 86%) + "(b) LSTM的训练损失",
+    [],
+    image("./assets/3.png", width: 90%) + "(c) Transformer的训练损失",
+  ),
+))<4.4>
 
 #thanks[
 

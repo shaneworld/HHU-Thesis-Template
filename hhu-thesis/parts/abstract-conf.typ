@@ -27,8 +27,6 @@
   if not cn-abstract in (none, [], "") or not cn-keywords in (none, ()) {
     {
 
-      v(1.5cm)
-
       heading(numbering: none, level: 1, outlined: true, bookmarked: true, [摘#h(1em)要])
 
       v(0.5cm)
@@ -50,10 +48,12 @@
     {
       pagebreak(weak: true)
 
+      v(-1em)
+
       // 计入目录
       heading(numbering: none, level: 1, outlined: true, bookmarked: true, [ABSTRACT])
 
-      v(1cm)
+      v(1.2em)
 
       en-abstract
 

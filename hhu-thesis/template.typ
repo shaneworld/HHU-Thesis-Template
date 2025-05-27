@@ -9,7 +9,7 @@
 #import "parts/hhu-bibliography.typ": hhu-bibliography
 #import "parts/translation-conf.typ": translation-bilingual
 
-#import "setup/set-bachelor.typ": set-bachelor, chinese-numbering, ziti, zihao
+#import "setup/set-bachelor.typ": set-bachelor
 
 #import "utils/utils.typ": i-figured
 
