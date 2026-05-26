@@ -1,5 +1,5 @@
-//#import "@preview/a2c-nums:0.0.1": int-to-cn-num
-#import "@preview/cuti:0.4.0": show-cn-fakebold, fakebold
+#import "@preview/a2c-nums:0.0.1": int-to-cn-num
+#import "@preview/cuti:0.3.0": fakebold, show-cn-fakebold as cuti-show-cn-fakebold
 #import "@preview/i-figured:0.2.4"
 
 #let _typst-numbering = numbering
@@ -32,6 +32,23 @@
   代码: ("FiraCode Nerd Font", "Times New Roman", "SimSun"),
 )
 
+// 重新定义 show-cn-fakebold：
+// 正文仍然使用 cuti 的中文伪粗体，
+// 但公式环境中的中文强制恢复为普通宋体，避免公式里的汉字被加粗。
+#let show-cn-fakebold(doc) = {
+  show: cuti-show-cn-fakebold
+
+  show math.equation: eq => {
+    show regex("[\u{4e00}-\u{9fff}]+"): cn => {
+      text(font: ziti.宋体, weight: "regular", cn)
+    }
+
+    eq
+  }
+
+  doc
+}
+
 // content 转换为字符串
 #let to-string(content) = {
   if content == none {
@@ -56,7 +73,7 @@
 
 #let fieldname(name, bold: false) = {
   set align(right + top)
-  set text(font : ziti.黑体, size : zihao.小三)
+  set text(font: ziti.黑体, size: zihao.小三)
   if bold {
     strong(name)
   } else {
@@ -136,9 +153,13 @@
 // 圆圈序号
 #let number-with-circle(
   num,
-) = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔㉕㉖㉗㉘㉙㉚㉛㉜㉝㉞㉟㊱㊲㊳㊴㊵㊶㊷㊸㊹㊺㊻㊼㊽㊾㊿".clusters().at(
-  num - 1,
-  default: "®",
+) = (
+  "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔㉕㉖㉗㉘㉙㉚㉛㉜㉝㉞㉟㊱㊲㊳㊴㊵㊶㊷㊸㊹㊺㊻㊼㊽㊾㊿"
+    .clusters()
+    .at(
+      num - 1,
+      default: "®",
+    )
 )
 
 // 标题序号显示方式
@@ -179,11 +200,11 @@
 
 // 单行公式后的段落首行缩进两字符
 #let show-math-equation(eq) = {
-  v(-0.8em)
-  par()[#text(size:0em)[#h(0em)]]
+  v(-0.6em)
+  par()[#text(size: 0em)[#h(0em)]]
   eq
-  v(-0.8em)
-  par()[#text(size:0em)[#h(0em)]]
+  v(-0.6em)
+  par()[#text(size: 0em)[#h(0em)]]
 }
 
 #let _prepare-equation-dict(it, level, zero-fill, leading-zero, numbering) = {
@@ -209,6 +230,26 @@
     dic.remove("counter")
   }
   dic + (numbering: n => _typst-numbering(numbering, ..numbers, n))
+}
+
+#let equation-numbering(
+  pattern: "(1.1)",
+  level: 1,
+  zero-fill: true,
+  leading-zero: true,
+) = n => context {
+  let numbers = counter(heading).at(here())
+  while zero-fill and numbers.len() < level {
+    numbers.push(0)
+  }
+  if numbers.len() > level {
+    numbers = numbers.slice(0, level)
+  }
+  if not leading-zero and numbers.at(0, default: none) == 0 {
+    numbers = numbers.slice(1)
+  }
+
+  _typst-numbering(pattern, ..numbers, n)
 }
 
 #let _equation-number-at(it, level, zero-fill, leading-zero, numbering, step: 0) = context {
@@ -239,39 +280,30 @@
 ) = {
   if (
     it.alt == "hhu-equation-number-wrap"
-    or
-    only-labeled and not it.has("label")
-    or it.has("label") and (
-      str(it.label).starts-with(prefix)
-      or str(it.label) == unnumbered-label
-    )
-    or not it.block
+      or only-labeled and not it.has("label")
+      or it.has("label")
+        and (
+          str(it.label).starts-with(prefix) or str(it.label) == unnumbered-label
+        )
+      or ("numbering" in it.fields() and it.numbering == none)
+      or not it.block
   ) {
     it
   } else {
-    let fields = _prepare-equation-dict(it, level, zero-fill, leading-zero, numbering)
-    let _ = fields.insert("alt", "hhu-equation-number-wrap")
     context layout(size => {
-      let equation-number = _equation-number-at(it, level, zero-fill, leading-zero, numbering, step: 1)
+      let equation-number = _equation-number-at(it, level, zero-fill, leading-zero, numbering)
       let number-width = measure(equation-number).width
       let body-width = measure(it.body).width
       let gap-width = measure(box(width: number-gap)).width
-      let equation = math.equation(it.body, ..fields)
-      let equation-label = label(if it.has("label") {
-        prefix + str(it.label)
-      } else {
-        prefix + "i-figured-no-label"
-      })
       if body-width + number-width + gap-width > size.width {
         [
-          #box(width: 0pt, height: 0pt, clip: true)[#equation #equation-label]
           #block(width: 100%)[
             #align(center)[#it.body]
             #align(right)[#equation-number]
           ]
         ]
       } else {
-        [#equation #equation-label]
+        it
       }
     })
   }
@@ -279,10 +311,10 @@
 
 // 图表后段落自动首行缩进
 #let show-figure(fig) = {
-  par()[#text(size:0em)[#h(0em)]]
+  par()[#text(size: 0em)[#h(0em)]]
   v(-1em)
   fig
-  par()[#text(size:0em)[#h(0em)]]
+  par()[#text(size: 0em)[#h(0em)]]
   v(-1em)
 }
 
@@ -318,15 +350,15 @@
     radius: 3pt,
     outset: 1.75pt,
     fill: rgb("#ffbfbf"),
-    stroke: 1pt + rgb("#ff8a8a")
+    stroke: 1pt + rgb("#ff8a8a"),
   ),
-  source
+  source,
 ) = {
   show raw.line: set text(..text-style)
   show raw: set text(..text-style)
-  
+
   set par(justify: false, leading: line-spacing)
-  
+
   let label-regex = regex("<((\w|_|-)+)>[ \t\r\f]*(\n|$)")
 
   let labels = source
@@ -334,7 +366,7 @@
     .split("\n")
     .map(line => {
       let match = line.match(label-regex)
-  
+
       if match != none {
         match.captures.at(0)
       } else {
@@ -347,12 +379,12 @@
   let number-style(number) = text(
     fill: stroke.paint,
     size: 1.25em,
-    raw(str(number))
+    raw(str(number)),
   )
 
   let unlabelled-source = source.text.replace(
     label-regex,
-    "\n"
+    "\n",
   )
 
   show raw.where(block: true): it => context {
@@ -397,15 +429,15 @@
                 text(
                   fill: stroke.paint,
                   size: 1.25em,
-                  raw(str(line.number))
+                  raw(str(line.number)),
                 )
               },
               {
                 let line-label = labels.at(line.number - 1)
-                
+
                 if line-label != none {
                   show figure: it => it.body
-                  
+
                   counter(figure.where(kind: "sourcerer")).update(line.number - 1)
                   [
                     #figure(supplement: "Line", kind: "sourcerer", outlined: false, line)
@@ -422,18 +454,18 @@
                   inset: 0pt,
                   outset: lang-box.outset,
                   radius: radius,
-                  text(size: 1.25em, raw(lang))
+                  text(size: 1.25em, raw(lang)),
                 )
-              }
+              },
             ))
-            .flatten()
+            .flatten(),
         )
-      }
+      },
     )
   }
 
   raw(block: true, lang: source.lang, unlabelled-source)
-  par()[#text(size:0em)[#h(0em)]]
+  par()[#text(size: 0em)[#h(0em)]]
   v(-1.2em)
 }
 
@@ -470,11 +502,11 @@
     let labels = pair.at(0).split("\n")
     let contents = pair.at(1).split("\n")
     let max_lines = calc.max(labels.len(), contents.len())
-    
+
     for i in range(max_lines) {
       result.push((
         labels.at(i, default: ""),
-        contents.at(i, default: "")
+        contents.at(i, default: ""),
       ))
     }
   }
@@ -501,8 +533,8 @@
   row-gutter: 1em,
   min-label_width: 2em,
   min-content-width: 8em,
-  label-style: (content) => [#content],
-  content-style: (content) => [#content]
+  label-style: content => [#content],
+  content-style: content => [#content],
 ) = {
   // Ensure pairs is an array
   assert(type(pairs) == array, message: "pairs must be an array of (label, content) tuples")
@@ -520,33 +552,34 @@
       // Measure content with wrap disabled to get its full single-line width
       measure(content-style(pair.at(1))).width
     })
-    
+
     // Convert min_label_width and min_content_width to pt
     let min_label_width_pt = measure(box(width: min-label_width)).width
     let min_content_width_pt = measure(box(width: min-content-width)).width
     let min_spliter_width_pt = measure(box(spliter)).width
-    
+
     // Calculate maximum widths, respecting minimum defaults
     let max_label_width = calc.max(label_widths.fold(0pt, (a, b) => calc.max(a, b)), min_label_width_pt)
     let max_content_width = calc.max(content_widths.fold(0pt, (a, b) => calc.max(a, b)), min_content_width_pt)
     let max_spliter_width = calc.max(measure(box(spliter)).width, min_spliter_width_pt)
-    
+
     // Create the grid with dynamic column widths
     grid(
       align: align,
       columns: (max_label_width, spliter-width, max_content_width),
       row-gutter: row-gutter,
-      ..processed_pairs.map(pair => (
-        label-style(pair.at(0)), 
-
-        // Only the first line of labels should be followed by a spliter
-        if pair.at(0) != "" {
-          box(spliter)
-        } else {
-          box(width: 0em) // Empty box for empty labels
-        },
-        content-style(pair.at(1))
-      )).flatten()
+      ..processed_pairs
+        .map(pair => (
+          label-style(pair.at(0)),
+          // Only the first line of labels should be followed by a spliter
+          if pair.at(0) != "" {
+            box(spliter)
+          } else {
+            box(width: 0em) // Empty box for empty labels
+          },
+          content-style(pair.at(1)),
+        ))
+        .flatten()
     )
   }
 }

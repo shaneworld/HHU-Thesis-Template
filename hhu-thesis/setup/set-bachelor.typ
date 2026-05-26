@@ -1,4 +1,6 @@
-#import "../utils/utils.typ": ziti, zihao, chinese-numbering, show-cn-fakebold, i-figured, show-equation, show-math-equation, show-figure
+#import "../utils/utils.typ": (
+  chinese-numbering, equation-numbering, i-figured, show-cn-fakebold, show-equation, show-figure, show-math-equation, zihao, ziti,
+)
 #import "../parts/heading-conf.typ": heading-conf
 
 #let set-bachelor(always-new-page: true, doc) = {
@@ -6,7 +8,7 @@
   set text(font: ziti.宋体, size: zihao.小四, weight: "regular", lang: "zh")
   set par(first-line-indent: (amount: 2em, all: true), leading: 1.2em, justify: true)
 
-  set enum(numbering: it  => {
+  set enum(numbering: it => {
     v(0.125em)
     numbering("1.", it)
   })
@@ -36,13 +38,14 @@
   // 图表caption数字展示方式
   show figure: i-figured.show-figure.with(numbering: "1-1")
   show figure.where(kind: table): i-figured.show-figure.with(numbering: "1.1")
+  set math.equation(numbering: equation-numbering())
   show math.equation.where(block: true): show-equation
   set math.equation(number-align: bottom)
   // 公式算作单独段落
   show math.equation.where(block: true): show-math-equation
   set math.cases(gap: 1em)
   show math.frac: math.display
-  
+
   show figure: show-figure
 
   set heading(numbering: chinese-numbering)
